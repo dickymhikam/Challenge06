@@ -1,20 +1,40 @@
-import './App.css';
-import Home from './components/Home';
-import Detail from './components/Detail';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import "./App.css";
+import Home from "./pages/Home";
+import Detail from "./pages/Detail";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Protected from "./components/Protected"
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-    <Router>
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID}>
+    <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Home/>}></Route>
-        <Route path='/detail/:Id' element={<Detail/>}></Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/detail/:Id" element={<Detail />} />
+        <Route
+          path="/"
+          element={
+            <Protected>
+              <Home />
+            </Protected>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <Protected>
+              <Dashboard />
+            </Protected>
+          }
+        />
       </Routes>
-    </Router>
-      </header>
-    </div>
+    </BrowserRouter>
+  </GoogleOAuthProvider>
   );
 }
 

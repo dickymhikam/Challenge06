@@ -1,28 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { useParams,useNavigate } from 'react-router-dom';
-import { Star} from 'react-bootstrap-icons';
-
-
+import {useParams,useNavigate } from 'react-router-dom';
+import {Star} from 'react-bootstrap-icons';
+import axios from 'axios';
+import { toast } from 'react-toast';
 
 function DetailMovie() {
   const { Id } = useParams();
   const [movie, setMovie] = useState(null);
   const navigate = useNavigate()
+
   useEffect(() => {
     const fetchmovieDetail = async () => {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_BASEURL}/movie/${Id}?api_key=${process.env.REACT_APP_APIKEY}`
-        );
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        const token = localStorage.getItem("token")
+        const response = await axios.get (`https://shy-cloud-3319.fly.dev/api/v1/movie/${Id}`,
+        {
+          headers: {
+            Authorization : `Bearer ${token}`
+          }
         }
-        const data = await response.json();
+      );
+        const data = response.data.data
         setMovie(data);
       } catch (error) {
-        console.error('Error fetching movie detail:', error);
+        if (axios.isAxiosError(error)) {
+          // If not valid token
+          if (error.response.status === 401) {
+            localStorage.removeItem("token");
+            // Temporary solution
+          }
+
+          toast.error(error.response.data.message);
+          return;
+        }
+        toast.error(error.message);
       }
     };
+  
 
     fetchmovieDetail();
   }, [Id]);
