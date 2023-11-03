@@ -1,65 +1,29 @@
 //import hook react
-import React, { useState } from 'react';
-
-//import hook useHitory from react router dom
-import { useNavigate } from 'react-router-dom'; 
-
-//import axios
-import axios from 'axios';
-import { toast } from 'react-toast';
-import GoogleLogin from '../components/GoogleLogin';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import GoogleLogin from "../components/GoogleLogin";
+import { register } from "../redux/actions/authActions";
 
 function Register() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    //define state
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    //define state validation
-   
+  const onSubmit = async (e) => {
+    e.preventDefault();
 
-    //define history
-    const navigate = useNavigate(); 
+    let data = JSON.stringify({
+      name,
+      email,
+      password,
+    });
 
-    //function "registerHanlder"
-    const registerHandler = async (e) => {
-        e.preventDefault();
-        
-        //initialize formData
-        try {
-            let data = JSON.stringify({
-              name,
-              email,
-              password,
-            });
-      
-            let config = {
-              method: "post",
-              url: `https://shy-cloud-3319.fly.dev/api/v1/auth/register`,
-              headers: {
-                "Content-Type": "application/json",
-              },
-              data: data,
-            };
-      
-            const response = await axios.request(config);
-            const { token } = response.data.data;
-      
-            localStorage.setItem("token", token);
-      
-            navigate("/login");
-      
-            // Temporary solution
-            window.location.href = "/login";
-          } catch (error) {
-            if (axios.isAxiosError(error)) {
-              toast.error(error.response.data.message);
-              return;
-            }
-            toast.error(error.message);
-          }
-        };
+    dispatch(register(data, navigate));
+  };
 
     return (
         <div className="container" style={{ marginTop: "70px" }}>
@@ -69,7 +33,7 @@ function Register() {
                     <div className="card-body">
                         <h4 className="fw-bold text-center">REGISTER</h4>
                         <hr/>
-                        <form onSubmit={registerHandler}>
+                        <form onSubmit={onSubmit}>
                             <div className="mb-3">
                             <label className="form-label fw-medium">NAMA LENGKAP</label>
                             <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} placeholder="Masukkan Nama Lengkap"/>

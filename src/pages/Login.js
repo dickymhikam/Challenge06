@@ -1,59 +1,26 @@
-//import hook react
 import React, { useState } from "react";
-
-//import hook useHitory from react router dom
-import { useNavigate } from "react-router";
-
-//import axios
-import axios from "axios";
-import { toast } from "react-toast";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import GoogleLogin from "../components/GoogleLogin";
+import { login } from "../redux/actions/authActions";
 
 function Login() {
-  //define state
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  //define history
-  const navigate = useNavigate();
-
-  //function "loginHanlder"
-  const loginHandler = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      let data = JSON.stringify({
-        email,
-        password,
-      });
+    let data = JSON.stringify({
+      email,
+      password,
+    });
 
-      let config = {
-        method: "post",
-        url: `https://shy-cloud-3319.fly.dev/api/v1/auth/login`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
-
-      const response = await axios.request(config);
-      const { token } = response.data.data;
-
-      localStorage.setItem("token", token);
-
-      navigate("/");
-
-      // Temporary solution
-      window.location.href = "/";
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response.data.message);
-        return;
-      }
-      toast.error(error.message);
-    }
+    dispatch(login(data, navigate));
   };
-
   return (
     <div className="container" style={{ marginTop: "120px" }}>
       <div className="row justify-content-center">
@@ -62,7 +29,7 @@ function Login() {
             <div className="card-body">
               <h4 className="fw-bold text-center">LOGIN</h4>
               <hr />
-              <form onSubmit={loginHandler}>
+              <form onSubmit={onSubmit}>
                 <div className="mb-3">
                   <label className="form-label fw-medium">ALAMAT EMAIL</label>
                   <input
